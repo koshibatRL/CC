@@ -1,8 +1,11 @@
-import React, { useEffect } from 'react';
+import React, {useEffect} from 'react';
 import ReactGA from 'react-ga4';
 import JobApplicationTracker from './components/JobApplicationTracker';
 import './App.css';
-
+/**
+ * Main App component for the Career Compass application.
+ * @return {JSX.Element} The rendered App component
+ */
 function App() {
   useEffect(() => {
     // Google Analyticsの初期化とページビュー送信
