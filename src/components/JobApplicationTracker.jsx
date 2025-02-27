@@ -40,7 +40,7 @@ const JobApplicationTracker = () => {
     },
     { 
       id: 3, 
-      company: 'Startup Ventures WTFFF', 
+      company: 'Startup Ventures', 
       position: 'Product Manager', 
       dateApplied: '2025-01-28', 
       status: 'Offer', 
@@ -139,84 +139,130 @@ const JobApplicationTracker = () => {
     setNewInterview({ ...newInterview, [name]: value });
   };
 
-  const addJob = () => {
-    if (!newJob.company || !newJob.position) return;
-    
-    const job = {
-      ...newJob,
-      id: editing ? newJob.id : Date.now(),
-      dateApplied: newJob.dateApplied || new Date().toISOString().slice(0, 10),
-      interviews: newJob.interviews || []
-    };
-    
-    // Firestoreに保存
-    const saveJobToFirestore = async () => {
-      if (user) {
-        try {
-          const newJobDoc = await firebaseAddJob(user.uid, job);
-          setJobs(prevJobs => [
-            { id: newJobDoc.id, ...job }, 
-            ...prevJobs
-          ]);
-        } catch (error) {
-          console.error("Failed to add job:", error);
-        }
-      }
-    };
-
-    if (editing) {
-      setJobs(jobs.map(j => j.id === job.id ? job : j));
-      setEditing(false);
-    } else {
-      saveJobToFirestore();
-    }
-    
-    // フォームをリセット
-    setNewJob({
-      id: null,
-      company: '',
-      position: '',
-      dateApplied: '',
-      status: 'Applied',
-      priority: 'Medium',
-      notes: '',
-      interviews: []
-    });
-  };
-
-  const handleUpdateJob = async (jobId, updatedData) => {
-    console.log('handleUpdateJob called');
-    console.log('jobId:', jobId);
-    console.log('updatedData:', updatedData);
-    console.log('Current user:', user);
-  
-    if (user) {
-      try {
-        console.log('Attempting to update job in Firestore');
-        await firebaseUpdateJob(jobId, updatedData);
+// addJob 関数の修正
+  const addJob = async () => {
+        if (!newJob.company || !newJob.position) return;
         
-        console.log('Firestore update successful');
-        setJobs(prevJobs => {
-          const updatedJobs = prevJobs.map(job => 
-            job.id === jobId ? { ...job, ...updatedData } : job
-          );
-          console.log('Updated local jobs state:', updatedJobs);
-          return updatedJobs;
+        const job = {
+        ...newJob,
+        id: editing ? newJob.id : Date.now(),
+        dateApplied: newJob.dateApplied || new Date().toISOString().slice(0, 10),
+        interviews: newJob.interviews || []
+        };
+        
+        try {
+        if (editing) {
+            // 既存のジョブを更新
+            console.log('Updating existing job with ID:', job.id);
+            const updatedJob = await firebaseUpdateJob(job.id, job);
+            
+            setJobs(prevJobs => prevJobs.map(j => j.id === job.id ? { ...j, ...updatedJob } : j));
+            setEditing(false);
+        } else {
+            // 新しいジョブを追加
+            if (user) {
+            console.log('Adding new job for user:', user.uid);
+            const newJobData = await firebaseAddJob(user.uid, job);
+            
+            console.log('Job added successfully:', newJobData);
+            
+            // 新しいジョブをUIに追加 (Firestoreから返されたIDを使用)
+            setJobs(prevJobs => [
+                { ...job, id: newJobData.id }, 
+                ...prevJobs
+            ]);
+            }
+        }
+        
+        // フォームをリセット
+        setNewJob({
+            id: null,
+            company: '',
+            position: '',
+            dateApplied: '',
+            status: 'Applied',
+            priority: 'Medium',
+            notes: '',
+            interviews: []
         });
-      } catch (error) {
-        console.error("Failed to update job:", error);
+        } catch (error) {
+        console.error("Failed to save job:", error);
+        // ここでエラーメッセージをユーザーに表示するロジックを追加できます
+        }
+  };
+ 
+  // deleteJob 関数の修正
+  const deleteJob = async (id) => {
+    console.log('Attempting to delete job with ID:', id);
+    
+    if (!user) {
+      console.warn('No user found, cannot delete job');
+      return;
+    }
+    
+    try {
+      // Firestoreのジョブを削除 (IDは文字列として扱う)
+      await firebaseDeleteJob(id.toString());
+      console.log('Job deleted from Firestore');
+      
+      // UIからも削除
+      setJobs(prevJobs => prevJobs.filter(job => job.id !== id));
+      
+      // 選択されたジョブが削除されたジョブと同じなら、選択を解除
+      if (selectedJob && selectedJob.id === id) {
+        setSelectedJob(null);
+        setShowJobDetailsModal(false);
       }
-    } else {
-      console.warn('No user found, cannot update job');
+    } catch (error) {
+      console.error("Failed to delete job:", error);
     }
   };
   
+  // addInterview 関数の修正
+  const addInterview = async () => {
+    if (!selectedJob) return;
+    
+    const updatedJob = {
+      ...selectedJob,
+      interviews: [...selectedJob.interviews, newInterview]
+    };
+    
+    try {
+      // Firestoreのジョブを更新
+      await firebaseUpdateJob(selectedJob.id.toString(), updatedJob);
+      console.log('Interview added to job in Firestore');
+      
+      // ローカルの状態を更新
+      setJobs(prevJobs => prevJobs.map(job => job.id === selectedJob.id ? updatedJob : job));
+      setSelectedJob(updatedJob);
+      
+      // フォームをリセット
+      setShowInterviewForm(false);
+      setNewInterview({
+        date: new Date().toISOString().slice(0, 10),
+        type: 'Behavioral',
+        notes: '',
+        strengths: '',
+        improvements: '',
+        rating: 5
+      });
+    } catch (error) {
+      console.error("Failed to add interview:", error);
+    }
+  };
+  
+  // editJob 関数の修正
   const editJob = (job) => {
     console.log('editJob called with:', job);
     setEditing(true);
     setNewJob({ ...job });
-  
-    // 編集中のジョブを更新
+    
+    // この部分は削除または修正
+    // 編集中のジョブを直ちに更新するロジックは不要
+    // ユーザーが編集して「更新」ボタンをクリックしたときに更新するべき
+    
+    // 以下のコードは削除し、addJob関数で対応するようにします
+    /*
     if (job.id) {
       const updatedJob = {
         ...job,
@@ -226,49 +272,12 @@ const JobApplicationTracker = () => {
       console.log('Preparing to update job:', updatedJob);
       handleUpdateJob(job.id, updatedJob);
     }
-  };
-  
-
-  const deleteJob = async (id) => {
-    if (user) {
-      try {
-        await firebaseDeleteJob(id);
-        setJobs(jobs.filter(job => job.id !== id));
-        
-        if (selectedJob && selectedJob.id === id) {
-          setSelectedJob(null);
-          setShowJobDetailsModal(false);
-        }
-      } catch (error) {
-        console.error("Failed to delete job:", error);
-      }
-    }
+    */
   };
 
   const viewJobDetails = (job) => {
     setSelectedJob(job);
     setShowJobDetailsModal(true);
-  };
-
-  const addInterview = () => {
-    if (!selectedJob) return;
-    
-    const updatedJob = {
-      ...selectedJob,
-      interviews: [...selectedJob.interviews, newInterview]
-    };
-    
-    setJobs(jobs.map(job => job.id === selectedJob.id ? updatedJob : job));
-    setSelectedJob(updatedJob);
-    setShowInterviewForm(false);
-    setNewInterview({
-      date: new Date().toISOString().slice(0, 10),
-      type: 'Behavioral',
-      notes: '',
-      strengths: '',
-      improvements: '',
-      rating: 5
-    });
   };
 
   const generateAIAnalysis = () => {
@@ -1056,14 +1065,19 @@ const JobApplicationTracker = () => {
                     />
                 </div>
                 <div>
-                    <label className={`block text-sm font-medium ${themeStyles.text} mb-1`}>Date Applied</label>
-                    <input
-                    type="date"
+                  <label className={`block text-sm font-medium ${themeStyles.text} mb-1`}>Date Applied</label>
+                  <input
+                    type="text"
                     name="dateApplied"
                     value={newJob.dateApplied}
-                    onChange={handleInputChange}
+                    onChange={(e) => {
+                      // 単純に入力を受け付ける
+                      setNewJob({ ...newJob, dateApplied: e.target.value });
+                    }}
                     className={`w-full p-2 border rounded ${themeStyles.input}`}
-                    />
+                    placeholder="YYYY-MM-DD"
+                  />
+                  <p className="text-xs text-gray-500 mt-1">Format: YYYY-MM-DD (e.g. 2025-02-28)</p>
                 </div>
                 <div>
                     <label className={`block text-sm font-medium ${themeStyles.text} mb-1`}>Status</label>

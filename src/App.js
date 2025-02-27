@@ -1,6 +1,6 @@
 import React, {useEffect} from 'react';
 import ReactGA from 'react-ga4';
-import JobApplicationTracker from './components/JobApplicationTracker';
+import AuthContainer from './components/AuthContainer';
 import './App.css';
 /**
  * Main App component for the Career Compass application.
@@ -15,7 +15,7 @@ function App() {
 
   return (
     <div className="App">
-      <JobApplicationTracker />
+      <AuthContainer />
     </div>
   );
 }
