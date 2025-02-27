@@ -1,70 +1,60 @@
-# Getting Started with Create React App
+# Career Compass - AI-Powered Job Application Tracker
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+# What is it?
 
-## Available Scripts
+Career Compass is a web application I built to help organize job hunting. It tracks applications, interview feedback, and provides insights on your job search progress.
 
-In the project directory, you can run:
+# Features
 
-### `npm start`
+* Track job applications with status updates (Applied, Phone Screen, Interview, etc.)
+* Record and analyze interview experiences
+* Visualize your application pipeline with interactive charts
+* AI-powered insights based on your interview feedback
+* Personalized recommendations to improve your job search
+* User authentication with Firebase
+* Dark/light mode support
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+# Tech Stack
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+* React frontend with Tailwind CSS
+* Firebase (Authentication, Firestore)
 
-### `npm test`
+# Live Demo
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
 
-### `npm run build`
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+# Why I built it
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+As a job seeker myself, I struggled to keep track of multiple applications and interview feedback. Spreadsheets weren't cutting it, so I built this tool to help myself and others in the same situation.
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+# Looking for feedback on
 
-### `npm run eject`
+* UI/UX design - is it intuitive?
+* Feature suggestions - what would make this more useful?
+* AI insights - are there other analytics that would be helpful?
+* Potential monetization strategies - would you pay for premium features?
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+# Development Journey
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+* Developed in just 1 day using Claude Sonnet 3.7
+* As a Python/ML background developer with zero prior web application experience
+* Leveraged AI assistance to rapidly prototype and build a full-stack application
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+# AI-Powered Development Insights
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+Building this project was a fascinating journey of AI-assisted development. Coming from a Python and Machine Learning background with no prior web development experience, I was able to create a full-featured web application in just one day, primarily by using Claude Sonnet 3.7 as a coding partner.
 
-## Learn More
+# Future AI-Enhanced Features I'm Exploring
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+I'm looking to leverage my ML and LLM background to add some cutting-edge features. Some ideas I'm considering:
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+* Advanced job application prediction models
+* AI-powered resume optimization
+* Personalized interview preparation chatbot
+* Automated cover letter generation
+* Sentiment analysis of interview feedback
+* Skill gap analysis based on job applications
 
-### Code Splitting
+**What AI-powered features would YOU find most useful in a job application tracking tool?**
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+Thanks for checking it out!!! Happy to answer any questions.
