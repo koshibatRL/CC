@@ -1,9 +1,15 @@
-import {render, screen} from '@testing-library/react';
-import App from './App';
 import React from 'react';
+import { render, screen } from '@testing-library/react';
+import App from './App';
 
-test('renders learn react link', () => {
+// モックを追加
+jest.mock('react-ga4', () => ({
+  initialize: jest.fn(),
+  send: jest.fn()
+}));
+
+test('renders JobApplicationTracker', () => {
   render(<App />);
-  const linkElement = screen.getByText(/learn react/i);
-  expect(linkElement).toBeInTheDocument();
+  const trackerElement = screen.getByText(/Career Compass/i);
+  expect(trackerElement).toBeInTheDocument();
 });
