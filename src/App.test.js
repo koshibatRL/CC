@@ -9,9 +9,6 @@ jest.mock('./firebase', () => ({
     currentUser: null,
     signInWithEmailAndPassword: jest.fn(),
   },
-  db: {
-    // 必要に応じて最小限のモック実装
-  }
 }));
 
 // モックを追加
