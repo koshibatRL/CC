@@ -1,4 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { 
+  addJob as firebaseAddJob, 
+  getUserJobs, 
+  updateJob as firebaseUpdateJob, 
+  deleteJob as firebaseDeleteJob 
+} from '../services/jobService';
 
 const JobApplicationTracker = () => {
   // Initial sample data
@@ -91,11 +97,36 @@ const JobApplicationTracker = () => {
   const [showAnalysisModal, setShowAnalysisModal] = useState(false);
   const [aiAnalysis, setAiAnalysis] = useState({});
   const [theme, setTheme] = useState('default');
+  const [user, setUser] = useState(null);
 
   // Status options
   const statusOptions = ['Applied', 'Rejected', 'Phone Screen', 'Interview', 'Final Round', 'Offer', 'Accepted', 'Declined'];
   const priorityOptions = ['Low', 'Medium', 'High'];
   const interviewTypes = ['Behavioral', 'Technical', 'Case Study', 'Panel', 'Phone Screen', 'Onsite', 'Final Round'];
+
+  // ユーザー管理
+  useEffect(() => {
+    const mockUser = { 
+      uid: 'dummy-user-id',
+      email: 'user@example.com'
+    };
+    setUser(mockUser);
+  }, []);
+
+  // データ取得
+  useEffect(() => {
+    const fetchJobs = async () => {
+      if (user) {
+        try {
+          const userJobs = await getUserJobs(user.uid);
+          setJobs(userJobs);
+        } catch (error) {
+          console.error("Failed to fetch jobs:", error);
+        }
+      }
+    };
+    fetchJobs();
+  }, [user]);
 
   // Handlers
   const handleInputChange = (e) => {
@@ -118,13 +149,29 @@ const JobApplicationTracker = () => {
       interviews: newJob.interviews || []
     };
     
+    // Firestoreに保存
+    const saveJobToFirestore = async () => {
+      if (user) {
+        try {
+          const newJobDoc = await firebaseAddJob(user.uid, job);
+          setJobs(prevJobs => [
+            { id: newJobDoc.id, ...job }, 
+            ...prevJobs
+          ]);
+        } catch (error) {
+          console.error("Failed to add job:", error);
+        }
+      }
+    };
+
     if (editing) {
       setJobs(jobs.map(j => j.id === job.id ? job : j));
       setEditing(false);
     } else {
-      setJobs([...jobs, job]);
+      saveJobToFirestore();
     }
     
+    // フォームをリセット
     setNewJob({
       id: null,
       company: '',
@@ -137,16 +184,64 @@ const JobApplicationTracker = () => {
     });
   };
 
+  const handleUpdateJob = async (jobId, updatedData) => {
+    console.log('handleUpdateJob called');
+    console.log('jobId:', jobId);
+    console.log('updatedData:', updatedData);
+    console.log('Current user:', user);
+  
+    if (user) {
+      try {
+        console.log('Attempting to update job in Firestore');
+        await firebaseUpdateJob(jobId, updatedData);
+        
+        console.log('Firestore update successful');
+        setJobs(prevJobs => {
+          const updatedJobs = prevJobs.map(job => 
+            job.id === jobId ? { ...job, ...updatedData } : job
+          );
+          console.log('Updated local jobs state:', updatedJobs);
+          return updatedJobs;
+        });
+      } catch (error) {
+        console.error("Failed to update job:", error);
+      }
+    } else {
+      console.warn('No user found, cannot update job');
+    }
+  };
+  
   const editJob = (job) => {
+    console.log('editJob called with:', job);
     setEditing(true);
     setNewJob({ ...job });
+  
+    // 編集中のジョブを更新
+    if (job.id) {
+      const updatedJob = {
+        ...job,
+        status: job.status,
+        priority: job.priority
+      };
+      console.log('Preparing to update job:', updatedJob);
+      handleUpdateJob(job.id, updatedJob);
+    }
   };
+  
 
-  const deleteJob = (id) => {
-    setJobs(jobs.filter(job => job.id !== id));
-    if (selectedJob && selectedJob.id === id) {
-      setSelectedJob(null);
-      setShowJobDetailsModal(false);
+  const deleteJob = async (id) => {
+    if (user) {
+      try {
+        await firebaseDeleteJob(id);
+        setJobs(jobs.filter(job => job.id !== id));
+        
+        if (selectedJob && selectedJob.id === id) {
+          setSelectedJob(null);
+          setShowJobDetailsModal(false);
+        }
+      } catch (error) {
+        console.error("Failed to delete job:", error);
+      }
     }
   };
 
