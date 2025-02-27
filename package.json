@@ -51,5 +51,8 @@
     "postcss": "^8.4.21",
     "tailwindcss": "^3.3.0"
   },
-  "homepage": "https://koshibatRL.github.io/CC"
+  "homepage": "https://koshibatRL.github.io/CC",
+  "engines": {
+    "node": "18.16.1"
+  }
 }
