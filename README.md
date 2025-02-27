@@ -21,7 +21,7 @@ Career Compass is a web application I built to help organize job hunting. It tra
 
 # Live Demo
 
-
+https://github.com/user-attachments/assets/a9d6952c-3cf2-4440-bbd4-4b2fc08f7e5a
 
 # Why I built it
 
